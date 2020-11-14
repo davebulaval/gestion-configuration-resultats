@@ -1,4 +1,4 @@
-## Gestion de l'entrainement, de la configuration et des résultats avec MLflow, Hydra et Poutyne
+## Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne
 
 ...
 
