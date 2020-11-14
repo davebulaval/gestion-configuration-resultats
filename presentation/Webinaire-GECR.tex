@@ -2,7 +2,7 @@
 %%%
 %%% Ce fichier et tous les fichiers .tex dont la racine est
 %%% mentionnée dans les commandes \include et \input ci-dessous font
-%%% partie du projet «Gestion de l'entrainement, de la configuration et des résultats avec MLflow, Hydra et Poutyne
+%%% partie du projet «Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne
 %%% - Webinaire»
 %%% URL
 %%%
@@ -36,16 +36,30 @@
 
 \usepackage{svg} %for svg image also need option --shell-escape
 
+\usepackage{dirtree}
+
+
 %% =============================
 %%  Informations de publication
 %% =============================
-\title{Gestion de l'entrainement, de la configuration et des résultats avec MLflow, Hydra et Poutyne}
+\title{Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne}
 \author{David Beauchemin}
 \date{.. novembre 2020}
 
 %% =======================
 %%  Apparence du document
 %% =======================
+
+%% Couleurs additionnelles
+\definecolor{rouge}{rgb}{1,0.31,0.26}
+\definecolor{bleu}{rgb}{0.18,0.23,1}
+\definecolor{couleurpolice}{rgb}{0.13,0.13,0.13}
+
+\definecolor{link}{cmyk}{0.67, 0.66, 0, 0.71}    % liens internes
+\definecolor{url}{rgb}{1,0.31,0.26}       % liens externes
+\definecolor{codebg}{rgb}{0.94, 0.95, 0.95}
+
+\colorlet{shadecolor}{codebg}
 
 %% Thème Beamer général
 \usetheme[titleformat=allcaps, numbering=none, block=transparent]{metropolis}
@@ -70,10 +84,8 @@
 
 %% Format de la page de titre de section;
 \makeatletter
+
 \setbeamertemplate{section page}{%
-	\begin{textblock*}{92.5mm}[1,1](187mm,90mm)
-		\includegraphics[height=\paperheight,keepaspectratio, angle=180,origin=c]{img/degrade-coin-rouge}
-	\end{textblock*}
 	\begin{minipage}{22em}
 		\raggedright
 		\usebeamerfont{section title}
@@ -82,6 +94,7 @@
 	\par
 	\vspace{\baselineskip}
 }
+
 \makeatother
 
 %% Polices de caractères
@@ -102,20 +115,6 @@ UprightFont = *-Light,
 BoldFont = *-Regular
 ]
 
-%% Couleurs additionnelles
-\definecolor{comments}{cmyk}{0,1, 1, 0}   % rouge foncé
-\definecolor{link}{cmyk}{0.67, 0.66, 0, 0.71}    % liens internes
-\definecolor{url}{cmyk}{0,1, 1, 0}       % liens externes
-\definecolor{codebg}{named}{LightYellow1} % fond code R
-\definecolor{rouge}{rgb}{0.85,0,0.07} % bandeau rouge UL
-\definecolor{or}{rgb}{1,0.8,0}        % bandeau or UL
-\definecolor{couleurpolice}{cmyk}{0.67, 0.66, 0, 0.71}
-
-\colorlet{alert}{mLightBrown} % alias pour couleur Metropolis
-\colorlet{dark}{mDarkTeal}    % alias pour couleur Metropolis
-\colorlet{code}{mLightGreen}  % alias pour couleur Metropolis
-\colorlet{shadecolor}{codebg}
-
 
 \setbeamercolor{frametitle}{fg=couleurpolice}
 \setbeamercolor{section in head/foot}{fg=couleurpolice}
@@ -126,7 +125,7 @@ BoldFont = *-Regular
 %% Hyperliens
 \hypersetup{%
 	pdfauthor = {David Beauchemin},
-	pdftitle = {Gestion de l'entrainement, de la configuration et des résultats avec MLflow, Hydra et Poutyne},
+	pdftitle = {Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne},
 	colorlinks = {true},
 	linktocpage = {true},
 	allcolors = {link},
@@ -168,12 +167,10 @@ BoldFont = *-Regular
 
 %% Lien externe
 \newcommand{\link}[2]{\href{#1}{#2~{\smaller\faExternalLink*}}}
+\newcommand{\guillement}[1]{\guillemotleft\  #1 \guillemotright}
 
 %% Simili commande \HUGE
 \newcommand{\HUGE}{\fontsize{36}{36}\selectfont}
-
-%% Raccourcis usuels vg
-\newcommand{\code}[1]{\textcolor{code}{\texttt{#1}}}
 
 %%% =======
 %%%  Varia
@@ -196,7 +193,7 @@ BoldFont = *-Regular
 	\begin{frame}{Objectifs de la présentation}
 		\begin{itemize}
 			\item Initier aux outils de gestion de l'entrainement, de la configuration et des résultats.
-			\item Développer des bonnes pratiques.
+			\item Développer de bonnes pratiques.
 			\item Améliorer votre productivité.
 		\end{itemize}
 	\end{frame}
@@ -212,7 +209,7 @@ BoldFont = *-Regular
 			\begin{itemize}
 				\item Introduit à la recherche reproductible en 2016 (\mbox{R Markdown} et \faGit)
 				\item Participation à REPROLANG de la conférence LREC \cite{garneau2020robust}
-				\item Membre actif dans le développement d'une librairie facilitant la reproductibilité (\href{https://poutyne.org/}{Poutyne})
+				\item Membre actif dans le développement d'une librairie facilitant la reproductibilité (\link{https://poutyne.org/}{Poutyne})
 			\end{itemize}
 		\end{minipage}
 		
@@ -225,650 +222,410 @@ BoldFont = *-Regular
 	\end{frame}
 
 	\begin{frame}{Au menu}
-		\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faFilesO \vfil
-				\vspace{1em}
-				\normalsize Gestion version
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faTachometer\vfil
-				\vspace{1em}
-				\normalsize Productivité
-				
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-				\centering
-				% Camille comment : Cette icone a un problème d'alignement ... 
-				\fontsize{35}{35}\faPencilSquareO\vfil
-				\vspace{1em}
-				\normalsize Présenter
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faRecycle\vfil
-				\vspace{1em}
-				\normalsize Réutiliser
-		\end{minipage}
-	\end{frame}
-	
-	\section{Introduction}
-	\begin{frame}{C'est quoi la reproductibilité ?}
-		La reproductibilité est le principe qui dit qu'on ne peut tirer de conclusions que d'un événement bien décrit, qui est apparu plusieurs fois, provoqué par des \textbf{personnes différentes}.
-		
-		Par contre, en apprentissage automatique, la reproductibilité correspond (surtout) à être capable de reproduire des résultats, soit d'obtenir des résultats similaires en réexécutant un code source\cite{pineau2020improving}.
-		
-		\note{
-			
-			Être capable de \textbf{répliquer} les résultats d'un article d'un projet, 
-			
-			à partir du même \textbf{jeu de données} ou un jeu de données différent (mais proche), 
-			
-			en utilisant la \textbf{procédure d'entraînement} de l'article ou en utilisant notre procédure d'entrainement et 
-			
-			en utilisant le \textbf{code} du projet.
-			
-			les points clés c'est l'idée que si une idée a de bons résultats, on devrait être capable de la reprendre et de retrouver les mêmes résultats.
-			
-			En ML, les idées c'est des algos et la reproductibilité devient juste d'être capable de s'assurer que les performances rapportées sont les mêmes.
-				
-	}
-	\end{frame}
-	
-	\begin{frame}{Pourquoi s'y intéresser ?}
-		\centering
-		\fontsize{35}{35}\selectfont70~\%\fontsize{25}{25}\footnote[1]{\cite{baker500ScientistsLift2016}}
-		
-		\note{
-			$70$~\% des chercheurs en science on échoué dans leur tentative de reproduire un article d'un autre chercheur
-		}
-	\end{frame}
-
-	\begin{frame}{Pourquoi s'y intéresser ?}
-	\centering
-	\fontsize{35}{35}\selectfont50~\%\fontsize{25}{25}\footnote[1]{\cite{baker500ScientistsLift2016}}
-
-		
-		\note{
-			$50$~\% n'ont pas réussit à reproduire leurs \textbf{propres} expérimentations
-		}
-	
-	\end{frame}
-
-	\begin{frame}{Pourquoi s'y intéresser ?}
-		\centering
-		\fontsize{35}{35} \selectfont40~\%\fontsize{25}{25}\footnote[2]{\cite{raff2019step}}
-		
-		
-		\note{
-			L'informatique ne fait pas exception à cela malgré la simplicité (théorique) de réplication des résultats. Selon une étude, sur \textbf{255} articles, près de $40$~\% n'étaient pas réplicable \cite{raff2019step}.
-		}
-		
-	\end{frame}
-	
-	\begin{frame}{Motivation}
-		\centering
-		\uncover<1->{\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faRecycle\vfil
-				\vspace{1em}
-				\normalsize Réutilisation
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faForward\vfil
-				\vspace{1em}
-				\normalsize Productivité
-		\end{minipage}}
-		\uncover<3->{\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faShare\vfil
-				\vspace{1em}
-				\normalsize Transfert
-		\end{minipage}}
-		\uncover<4->{\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faMapPin\vfil
-				\vspace{1em}
-				\normalsize Se faire connaître
-		\end{minipage}}
-		\note{La reproductibilité facilite la \textbf{réutilisation} pour d'autres projets de recherche, améliorer votre productivité \textbf{et} permet le transfert vers l'industrie (plus facilement). En bonus, cela aide à vous faire connaître si vous faites du contenu réutilisable par la communauté.}
-	\end{frame}
-	
-	\section{Les barrières à la reproductibilité}
-%		\begin{frame}		\def\ban{\fontsize{65}{65}\selectfont\textcolor[cmyk]{0.67, 0.66, 0, 0.71}\faBan}
-%		\def\database{\fontsize{35}{35}\selectfont\textcolor[cmyk]{0.67, 0.66, 0, 0.71}\faDatabase}
-%		\def\code{\fontsize{35}{35}\selectfont\textcolor[cmyk]{0.67, 0.66, 0, 0.71}\faCode}
-%		\def\gear{\fontsize{35}{35}\selectfont\textcolor[cmyk]{0.67, 0.66, 0, 0.71}\faCog}
-%		\centering
-%		\uncover<1->{\begin{minipage}{0.24\linewidth}
-%			\centering
-%			\def\stackalignment{c}
-%			\topinset{\database}{\rotatebox{90}{\ban}}{14pt}{-1pt}\vfil
-%			\vspace{1em}
-%			\normalsize Non-disponibilité des données
-%		\end{minipage}}
-%		\uncover<2->{\begin{minipage}{0.24\linewidth}
-%				\centering
-%				% Camille : encore le facogs qui gosse
-%				\fontsize{35}{35}\selectfont\textcolor[cmyk]{0.67, 0.66, 0, 0.71}\faCogs\vfil
-%				\vspace{1em}
-%				\normalsize Mauvaise spécification
-%		\end{minipage}}
-%		\uncover<3->{\begin{minipage}{0.24\linewidth}
-%				\centering
-%				\def\stackalignment{c}
-%				\topinset{\code}{\rotatebox{90}{\ban}}{14pt}{-1pt}\vfil
-%				\vspace{1em}
-%				\normalsize Non-disponibilité du code
-%		\end{minipage}}
-%		\uncover<4->{\begin{minipage}{0.24\linewidth}
-%				\centering
-%				\def\stackalignment{c}
-%				\topinset{\gear}{\rotatebox{90}{\ban}}{14pt}{-1pt}\vfil
-%				\vspace{1em}
-%				\normalsize Non-disponibilité des configurations
-%		\end{minipage}}
-%	\note{Non-disponibilité du jeu de données ou \textbf{version} (pas claire) du jeu de données, 
-%		\textbf{mauvaise spécification ou sous-spécification} du modèle et de la \textbf{procédure d'entraînement},
-%		manque de \textbf{disponibilité du code} nécessaire pour exécuter les expériences, ou \textbf{erreurs} dans le code,
-%		\textbf{configurations} du modèle déficientes
-%	}
-%	\end{frame}
-	
-	\begin{frame}
-		\begin{figure}
-			\centering
-			\includegraphics[scale=0.19]{img/cycle.png}
-			\caption{\href{https://eng.uber.com/scaling-michelangelo/}{From Uber Engineering}}
-		\end{figure}
-	\end{frame}
-	
-	\begin{frame}
-		\begin{figure}
-			\centering
-			\includegraphics[scale=0.24]{img/cycle-white.png}
-			\caption{\href{https://johann.schleier-smith.com/blog/2015/08/09/need-for-agile-machine-learning.html}{The need for Agile machine learning}}
-		\end{figure}
-	\end{frame}
-	
-	\section{OK, mais comment?}
-	
-	\begin{frame}{Au menu}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faFilesO
-			\vfil
-			\vspace{1em}
-			\normalsize Gestion version
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faTachometer};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Productivité};
-			
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faPencilSquareO};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Présenter};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faRecycle};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Réutiliser};
-		\end{minipage}
-	\end{frame}
-
-	\begin{frame}{Version des données \& Étapes de prétraitement}
-		\centering
-		\uncover<1->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faCopy\vfil
-				\vspace{1em}
-				\normalsize Version
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faServer\vfil
-				\vspace{1em}
-				\normalsize Gestion des versions
-		\end{minipage}}
-		\uncover<3->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faRoad\vfil
-				\vspace{1em}
-				\normalsize Étapes prétraitement
-		\end{minipage}}
-		\note{
-			Avec quelle version des données doit-on travailler?
-			
-			Comment gérer \textbf{facilement} plusieurs versions des données?
-			
-			Comment définir \textbf{facilement} les étapes de prétraitement des données?
-			
-			Il nous faut des \textit{\textbf{data pipelines}}, des tuyaux que nous pouvons \textbf{facilement} raccorder à nos modèles pour l'entrainement et la mise en production.
-		
-			Il faut somewhat voir nos données comme du code et qu'à chaque fois qu'on fait du traitement sur notre data c'est comme modifier notre codebase et c'est impératif d'avoir une trace, par exemple ...
-		}
-		
-	\end{frame}
-
-	\begin{frame}{Version des données \& Étapes de prétraitement}
 		\begin{minipage}{0.49\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/DVC} \vfil
-			\vspace{1.25em}
-			\href{https://dvc.org/}{Data Version Control}
-		\end{minipage}
-			\begin{minipage}{0.49\linewidth}
 				\centering
-				\includesvg[width=30pt, height=30pt]{./img/dask} \vfil
-				\vspace{0.75em}
-				\href{https://dask.org/}{Dask}
-			\end{minipage}
- 	\end{frame}
-	
-	\begin{frame}{Code}
-		\uncover<1->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faCopy\vfil
+				\fontsize{35}{35}\faCog\vfil
 				\vspace{1em}
-				\normalsize Version
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faList\vfil
-				\vspace{1em}
-				\normalsize Différence
-		\end{minipage}}
-		\uncover<3->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faCodeFork\vfil
-				\vspace{1em}
-				\normalsize Divergences
-		\end{minipage}}
-		\note{
-			Avec quelle version du code doit-on travailler?
-			
-			Comment savoir \textbf{rapidement} qu'elle est la différence d'implémentation entre deux versions du modèle?
-			
-			Comment gérer \textbf{facilement} les divergences d'expérimentations?
-			
-			Il nous faut un outil nous permettant de \textbf{visualiser} la différence entre des fichiers de code et nous permettant d'avoir \textbf{plusieurs} versions du code en même temps, par exemple ...
-		}
-	\end{frame}
-
-	\begin{frame}{Code}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faGit\vfill
-			\vspace{1em}
-			\normalsize \href{https://git-scm.com/}{Git}
+				\normalsize Gestion de la configuration
+				
 		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faGithub\vfill
-			\vspace{1em}
-			\normalsize \href{https://github.com/}{GitHub}
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faGitlab\vfill
-			\vspace{1em}
-			\normalsize \href{https://gitlab.com/}{GitLab}
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faBitbucket\vfill
-			\vspace{1em}
-			\normalsize \href{https://bitbucket.org/}{Bitbucket}
-		\end{minipage}
-	\end{frame}
-
-	\begin{frame}{Au menu}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faFilesO};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Gestion version};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faTachometer
-			\vfil
-			\vspace{1.5em}
-			\normalsize Productivité
-			
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faPencilSquareO};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Présenter};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faRecycle};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Réutiliser};
-		\end{minipage}
-	\end{frame}
-	
-	\subsection{Développement}
-	\begin{frame}{Développement des modèles}
-		\def\ban{\fontsize{65}{65}\faBan}
-		\def\tool{\fontsize{35}{35}\faWrench}
-		\centering
-		\uncover<1->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\def\stackalignment{c}
-				\topinset{\tool}{\rotatebox{90}{\ban}}{14pt}{-1pt}\vfil
-				\vspace{1em}
-				\normalsize Réinventer
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.32\linewidth}
-				\centering
-				% Camille : Celui la aussi il a pas la même taille initiale.
-				\fontsize{35}{35}\faMinusSquareO\vfil
-				\vspace{3.5em}
-				\normalsize Simplification
-		\end{minipage}}
-		\uncover<3->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faForward\vfil
-				\vspace{3.5em}
-				\normalsize Facilite
-		\end{minipage}}
-		\note{
-			Ne pas réinventer la roue.
-			
-			Simplifier l'écriture de code pour développer des modèles.
-			
-			Qui facilite l'entrainement (GPU, multi-GPU/CPU).
-			
-			Il nous faut des outils nous permettant de \textbf{simplifier} le \textbf{développement} de nos modèles, par exemple ...
-		}
-	\end{frame}
-
-	\begin{frame}{Développement des modèles}
-		\begin{minipage}{0.19\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/poutyne} \vfil
-			\vspace{1.5em}
-			\href{https://poutyne.org/}{Poutyne}
-		\end{minipage}
-		\begin{minipage}{0.19\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/lightning} \vfil
-			\vspace{2.75em}
-			\href{https://www.pytorchlightning.ai/}{PyTorch Lightning}
-		\end{minipage}
-		\begin{minipage}{0.19\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/scikitlearn} \vfil
-			\vspace{2.75em}
-			\href{https://scikit-learn.org/stable/}{Scikit-learn}
-		\end{minipage}
-			\begin{minipage}{0.19\linewidth}
-				\centering
-				\includesvg[width=40pt, height=40pt]{./img/gensim} \vfil
-				\vspace{1em}
-				\href{https://radimrehurek.com/gensim/}{Gensim}
-			\end{minipage}
-			\begin{minipage}{0.19\linewidth}
-				\centering
-				\includesvg[width=40pt, height=40pt]{./img/AllenNLP} \vfil
-				\vspace{3.75em}
-				\href{https://github.com/allenai/allennlp}{Allen NLP}
-			\end{minipage}
-	\end{frame}
-	
-	
-	\begin{frame}{Entraînement, configuration et résultats}
-		\centering
-		\uncover<1->{\begin{minipage}{0.24\linewidth}
-				\centering
-				\fontsize{35}{35}\faCodeFork\vfil
-				\vspace{1em}
-				\normalsize Version de l'entraînement
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.24\linewidth}
+		\begin{minipage}{0.49\linewidth}
 				\centering
 				\fontsize{35}{35}\faAreaChart\vfil
 				\vspace{1em}
-				\normalsize Résultats
+				\normalsize Gestion des résultats
+		\end{minipage}
+	\end{frame}
+	
+	\section{La gestion d'un projet}
+	\begin{frame}{Gestion des paramètres de configuration}
+		\begin{Scode}
+			@experiment.config \\
+			def config(): \\
+			\quad	seed = 42 \\
+			\quad	num\_runs = 10 \\
+			\quad	iteration = 0 \\
+			\quad	source\_language = "en" \\
+			\quad	target\_language = "de" \\
+			\quad 	src\_input = "path"  \# The input source embeddings \\
+			\quad 	trg\_input = "2e path" \# The input target embeddings \\
+			\quad 	other\_input = "3e path" \# Commentaire pas clair \\
+			\quad   $\vdots$ \\
+			\quad   (ligne 500) $n^e$ paramètre \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Gestion des paramètres de configuration}
+		\centering
+		\uncover<1->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Quel paramètre fait ça déjà?
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Quels paramètres sont nécessairement ensemble?
 		\end{minipage}}
 		\uncover<3->{\begin{minipage}{0.24\linewidth}
 				\centering
-				% Camille : facog semble correct though ... 
-				\fontsize{35}{35}\faCog\vfil
-				\vspace{1em}
-				\normalsize Visualisation
+				\normalsize Sont-ils tous essentiels?
 		\end{minipage}}
 		\uncover<4->{\begin{minipage}{0.24\linewidth}
 				\centering
-			\fontsize{35}{35}\faTimesCircleO\vfil
-			\vspace{1em}
-			\normalsize Erreurs d'entraînement
-	\end{minipage}}
+				\normalsize Comment doit-on se retrouver dans le projet?
+		\end{minipage}}
+	\end{frame}
 
+	\begin{frame}{Gestion des résultats}
+		\begin{Scode}
+			\dirtree{%
+			.1 .
+			.2 res\_1.txt.
+			.2 res\_2.txt.
+			.2 res\_3.txt.
+			.2 res\_4.txt.
+			.2 res\_5\_good.txt.
+			.2 res\_5.txt.
+			.2 res\_6\_fix\_a.txt.
+			.2 $\vdots$.
+			.2 $n^e$ fichier de résultats.
+		}
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Gestion des résultats}
+		\centering
+		\uncover<1->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Quelle configuration déjà avec ces résultats?
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Est-ce un succès ou un échec cet entrainement?
+		\end{minipage}}
+		\uncover<3->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Lequel contient mes meilleurs résultats?
+		\end{minipage}}
+		\uncover<4->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Comment doit-on se retrouver dans les résultats?
+		\end{minipage}}
+	\end{frame}
+
+	
+	\section{Les solutions}
+	
+	\begin{frame}{Au menu}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\fontsize{35}{35}\faCog
+			\vfil
+			\vspace{1em}
+			\normalsize Gestion de la configuration
+			
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faAreaChart};
+			\vfil
+			\vspace{1em}
+			\tikz\node[opacity=0.5]{\normalsize Gestion des résultats};
+		\end{minipage}
+	\end{frame}
+
+	\begin{frame}{Gestion de la configuration}
+		\centering
+		\uncover<1->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faForward\vfil
+				\vspace{1em}
+				\normalsize Simple et efficace
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faFlask\vfil
+				\vspace{1em}
+				\normalsize Facilite l'expérimentation
+		\end{minipage}}
+		\uncover<3->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faLineChart\vfil
+				\vspace{1em}
+				\normalsize Extensible
+		\end{minipage}}
 		\note{
-			Avec quelle version du code, du modèle et des données avons-nous fait cet entrainement?
+			On cherche une solution qui va être :
 			
-			Quels sont les résultats?
+			simple et efficace pour gérer nos configurations,
 			
-			Comment visualiser \textbf{rapidement} les résultats et les paramètres de configuration?
+			qui va faciliter l'expérimentation plutôt que la ralentir,
 			
-			Il nous faut des outils nous permettant de \textit{\textbf{logger}} les \textbf{paramètres} d'entrainement et les \textbf{résultats}, par exemple, ...
+			extensible pour permettre la définition de plusieurs paramètres tout en étant concis.
+		}
 		
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{\link{https://hydra.cc/}{Hydra}}
+		\framesubtitle{\textit{A framework for elegantly configuring complex applications}}
+		
+		\centering
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faIcon{osi}\vfil
+				\vspace{1em}
+				\normalsize \textit{Open source} et licence MIT
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faFile\vfil
+				\vspace{1em}
+				\normalsize Fichiers de configurations structurés YAML
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faIcon{cubes}\vfil
+				\vspace{1em}
+				\normalsize Fichiers de configurations hiérarchiques
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faCogs\vfil
+			\vspace{1em}
+			\normalsize Balayage de configurations
+		\end{minipage}
+		\note{
+		}
+	\end{frame}
+	
+	\begin{frame}{Configuration structuré}
+		\begin{Scode}
+			\dirtree{%
+				.1 conf.
+				.2 config.yaml.
+				.2 dataset.
+				.3 canadian.yaml.
+				.3 netherlands.yaml.
+				.2 embeddings.
+				.3 fast\_text.yaml.
+				.2 model.
+				.3 bi\_lstm\_bidirectionnal.yaml.
+				.3 bi\_lstm.yaml.
+				.3 lstm\_bidirectionnal.yaml.
+				.3 lstm.yaml.
+				.2 optimizer.
+				.3 adam.yaml.
+				.3 SGD.yaml.
+			}
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Configuration hiérarchique}
+		\begin{Scode}
+			data\_loader: \\
+			\quad	batch\_size: 2048 \\
+			setting: \\
+			\quad seed: 42 \\
+			\quad device: "cuda:0" \\
+			defaults: \\
+			\quad - optimizer: SGD \\
+			\quad - model: bi\_lstm \\
+			\quad - dataset: canadian \\
+			\quad - embeddings: fast\_text \\
+			trainer: \\
+			\quad num\_epochs: 1 \\
+			\quad patience: 30 \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Configuration hiérarchique}
+		optimizer: SGD
+		\begin{Scode}
+			optimizer: \\
+			\quad lr: 0.1 \\
+			\quad type: sgd \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Balayage de configurations}
+			
+			\begin{Scode}
+				python main.py --multirun task=1,2,3,4,5
+			\end{Scode}
+			
+			\begin{Scode}
+				python main.py -m 'main.x=int(interval(-5, 5))' 'main.y=interval(-5, 10)'
+			\end{Scode}
+		\note{Plusieurs choix de sweeper Ax, Joblib, Nevergrad}
+	\end{frame}
+
+	\begin{frame}{En bonus}
+		\begin{itemize}
+			\item Journalisation automatique et personnalisable
+			\item Instanciation paramétrique 
+			\begin{Scode}
+				\# @package \_group\_ \\
+				\quad \_target\_: my\_app.MySQLConnection \\
+				\quad host: localhost \\
+				\quad user: root \\
+				\quad password: 1234 \\
+			\end{Scode}
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Point négatif}
+		\begin{Scode}
+			hydra.utils.get\_original\_cwd()
+		\end{Scode}
+	\note{En raison de la journalisation automatique, le working directory change.}
+	\end{frame}
+
+	\begin{frame}{Au menu}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faCog};
+			\vfil
+			\vspace{1em}
+			\tikz\node[opacity=0.5]{\normalsize Gestion de la configuration};
+			
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\fontsize{35}{35}\faAreaChart
+			\vfil
+			\vspace{1em}
+			\normalsize Gestion des résultats
+		\end{minipage}
+	\end{frame}
+
+	\begin{frame}{Gestion des résultats}
+	\centering
+	\uncover<1->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{user-check}\vfil
+			\vspace{1em}
+			\normalsize Simple à utiliser
+	\end{minipage}}
+	\uncover<2->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{archive}\vfil
+			\vspace{1em}
+			\normalsize Journalisation des expérimentations
+	\end{minipage}}
+	\uncover<3->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation rapide des expérimentations
+	\end{minipage}}
+	\note{
+		On cherche une solution qui va être :
+		
+		simple à utiliser et \textit{utilisateur ready},
+		
+		qui va journaliser \textbf{intelligemment} nos expérimentations,
+		
+		qui permet de visualiser rapidement nos expérimentations et les comparer.
 	}
 	\end{frame}
 
-	\begin{frame}{Entraînement, configuration et résultats}
-	\begin{minipage}{0.24\linewidth}
+	\begin{frame}
+		\frametitle{\link{https://mlflow.org/}{MLflow Tracking}}
+		\framesubtitle{\textit{An open source platform for the machine learning lifecycle}}
+		
 		\centering
-		\includegraphics[width=40pt, height=40pt, keepaspectratio]{./img/MLflow} \vfil
-		\vspace{1.5em}
-		\href{https://mlflow.org/}{MLflow}
-	\end{minipage}
-	\begin{minipage}{0.24\linewidth}
-		\centering
-		\includesvg[width=40pt, height=40pt]{./img/hydra} \vfil
-		\vspace{2em}
-		\href{https://hydra.cc/}{Hydra}
-	\end{minipage}
-	\begin{minipage}{0.24\linewidth}
-		\centering
-		\fontsize{35}{35}\faGithub\vfill
-		\vspace{1em}
-		\normalsize\href{https://sacred.readthedocs.io/en/stable/}{Sacred}
-	\end{minipage}
-	\begin{minipage}{0.24\linewidth}
-		\centering
-		\fontsize{35}{35}\faGithub\vfill
-		\vspace{1em}
-		\normalsize\href{https://notificationdoc.ca/}{Notif}
-	\end{minipage}
-\end{frame}
-	
-	\begin{frame}{Au menu}
 		\begin{minipage}{0.24\linewidth}
 			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faFilesO};
-			\vfil
+			\fontsize{35}{35}\faIcon{osi}\vfil
 			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Gestion version};
+			\normalsize \textit{Open source} et licence Apache 2.0
 		\end{minipage}
 		\begin{minipage}{0.24\linewidth}
 			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faTachometer};
-			\vfil
-			\vspace{2em}
-			\tikz\node[opacity=0.5]{\normalsize Productivité};
-			
+			\fontsize{35}{35}\faIcon{cogs}\vfil
+			\vspace{1em}
+			\normalsize Suivie automatique de paramètres d'entrainement
 		\end{minipage}
 		\begin{minipage}{0.24\linewidth}
 			\centering
-			\fontsize{35}{35}\faPencilSquareO
-			\vfil
-			\vspace{2em}
-			\normalsize Présenter
-		\end{minipage}
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation simple
+		\end{minipage}	
 		\begin{minipage}{0.24\linewidth}
 			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faRecycle};
-			\vfil
-			\vspace{2em}
-			\tikz\node[opacity=0.5]{\normalsize Réutiliser};
+			\fontsize{35}{35}\faIcon{cubes}\vfil
+			\vspace{1em}
+			\normalsize Intégration avec Poutyne
 		\end{minipage}
+		\note{
+		}
 	\end{frame}
 
-	\begin{frame}{Rapport et analyse des résultats}
+	\begin{frame}{Suivie automatique de paramètres d'entrainement}
+		\begin{itemize}
+			\item Version du code (\faGit)*
+			\item Horodatage de l'entrainement
+			\item Succès/échec de l'entrainement
+			\item Configuration de l'ordinateur
+			\item Utilisateur
+		\end{itemize}
+	\note{*lorsque l'on utilise MLflow project}
+	\end{frame}
+
+	\begin{frame}{Visualisation simple}
+		\begin{Scode}
+			mlflow server -p 5000 -h 127.0.0.1 --backend-store-uri file:///absolute/path
+		\end{Scode}
+		\note{--backend-store-uri permet de gérer le lieu de la persistance
+		-h 127.0.0.1 permet d'ouvrir le port sinon 0.0.0.0 pour un local}
+	\end{frame}
+
+	\begin{frame}{Visualisation simple}
 		\centering
-		\uncover<1->{\begin{minipage}{0.32\linewidth}
+		\begin{figure}
+			\includegraphics[width=\linewidth,keepaspectratio, height=0.7\textheight]{img/mlflow-ui.png}
+			\caption{\link{https://databricks.com/blog/2018/06/05/introducing-mlflow-an-open-source-machine-learning-platform.html}{Introducing MLflow: an Open Source Machine Learning Platform}}
+		\end{figure}
+	\end{frame}
+
+
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La version de \guillement{base} implique de
+		\begin{itemize}
+			\item journaliser manuellement les paramètres de configuration,
+			\item journaliser manuellement les métriques à chaque étape et itération,
+			\item journaliser manuellement la version du code.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La solution, \color{bleu}MLFlowWriter\color{couleurpolice}, un \textit{callback} permettant de
+		\begin{itemize}
+			\item journaliser semi-automatiquement les paramètres de configuration,
+			\item journaliser automatiquement les métriques à chaque étape et itération,
+			\item journaliser automatiquement la version du code,
+			\item journaliser manuellement un modèle,
+			\item journaliser automatiquement les métriques de test lors d'une phase de test.
+		\end{itemize}
+	\end{frame}
+		
+	\section{La suite}
+	\begin{frame}{Présentation des résultats}
+				\centering
+		\begin{minipage}{0.49\linewidth}
 				\centering
 				\fontsize{35}{35}\faTable\vfil
 				\vspace{1em}
-				\normalsize Tableau des résultats
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.32\linewidth}
+				\normalsize Génération automatique des tableaux
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
 				\centering
-				\fontsize{35}{35}\faCalendar\vfil
+				\fontsize{35}{35}\faIcon{react}\vfil
 				\vspace{1em}
-				\normalsize Mise à jour
-		\end{minipage}}
-		\uncover<3->{\begin{minipage}{0.32\linewidth}
-				\centering
-				\fontsize{35}{35}\faAreaChart\vfil
-				\vspace{1em}
-				\normalsize Visualisation configuration
-		\end{minipage}}
-		
-		\note{
-			Comment créer des tableaux de résultats \textbf{facilement} (pas à la \textit{mitaine})?
-			
-			Comment s'assurer \textbf{facilement} que les résultats sont à jours?
-			
-			Comment visualiser \textbf{rapidement} les résultats et les paramètres de configuration?
-			
-			Il nous faut des outils nous permettant de \textbf{créer} des tableaux de résultats \textbf{à même les résultats}, soit de diminuer le plus possible le travail manuel, par exemple ...
-		}
-	\end{frame}
-
-	\begin{frame}{Rapport et analyse des résultats}
-		\begin{minipage}{0.18\linewidth}
-			\centering
-			\fontsize{35}{35}\faGithub\vfill
-			\vspace{3em}
-			\normalsize\href{https://github.com/jsleb333/python2latex}{Python2LaTeX}
-		\end{minipage}\footnote{\href{https://pythonexamples.org/pandas-render-dataframe-as-html-table/}{Ou en HTML avec Pandas}}
-		\begin{minipage}{0.18\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/tensorflow} \vfil
-			\vspace{1.5em}
-			\href{https://www.tensorflow.org/tensorboard?hl=fr}{TensorBoard}
-		\end{minipage}
-		\begin{minipage}{0.18\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/jupyter} \vfil
-			\vspace{1.5em}
-			\href{https://jupyter.org/}{Jupyter notebook}
-		\end{minipage}\footnote{\href{https://www.youtube.com/watch?v=7jiPeIFXb6U}{\textit{I don't like notebooks} - Joel Grus}}
-		\begin{minipage}{0.18\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/markdown} \vfil
-			\vspace{2.6em}
-			\href{https://fr.wikipedia.org/wiki/Markdown}{Markdown}
-		\end{minipage}
-		\begin{minipage}{0.18\linewidth}
-			\centering
-			\includesvg[width=40pt, height=40pt]{./img/dash} \vfil
-			\vspace{3.5em}
-			\href{https://dash.plotly.com/}{Dash}
-		\end{minipage}\footnote{\href{https://dash-gallery.plotly.host/dash-oil-and-gas/}{\textit{New York Oil and Gas}}}
-	\end{frame}
-
-	\begin{frame}{Au menu}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faFilesO};
-			\vfil
-			\vspace{1em}
-			\tikz\node[opacity=0.5]{\normalsize Gestion version};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faTachometer};
-			\vfil
-			\vspace{2em}
-			\tikz\node[opacity=0.5]{\normalsize Productivité};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faPencilSquareO};
-			\vfil
-			\vspace{2em}
-			\tikz\node[opacity=0.5]{\normalsize Présenter};
-		\end{minipage}
-		\begin{minipage}{0.24\linewidth}
-			\centering
-			\fontsize{35}{35}\faRecycle
-			\vfil
-			\vspace{2em}
-			\normalsize Réutiliser
+				\normalsize Rapport dynamique
 		\end{minipage}
 	\end{frame}
-	
-	\begin{frame}{Environnement}
-		
-		\centering
-		\uncover<1->{\begin{minipage}{0.49\linewidth}
-				\centering
-				\fontsize{35}{35}\faFileArchiveO\vfil
-				\vspace{1em}
-				\normalsize Différents environnements
-		\end{minipage}}
-		\uncover<2->{\begin{minipage}{0.49\linewidth}
-				\centering
-				\fontsize{35}{35}\faRecycle\vfil
-				\vspace{1em}
-				\normalsize Réutilisation
-		\end{minipage}}
-		
-		\note{
-			Comment s'assurer que nos modèles fonctionnent sur d'autres environnements?
-			
-			Comment faciliter la réutilisation de notre code?
-			}
-	\end{frame}
-
-	\begin{frame}{Environnement}
-			\begin{minipage}{0.49\linewidth}
-				\centering
-				\includesvg[width=40pt, height=40pt]{./img/docker} \vfil
-				\vspace{1em}
-				\href{https://www.docker.com/}{Docker}
-			\end{minipage}
-			\begin{minipage}{0.49\linewidth}
-				\centering
-				\includesvg[width=40pt, height=40pt]{./img/Kubernetes} \vfil
-				\vspace{1em}
-				\href{https://kubernetes.io/fr/}{Kubernetes}
-			\end{minipage}
-		\end{frame}
-		
-	\section{La suite}
 	\begin{frame}
 		\centering
 		\fontsize{35}{35}\faRefresh\vfil
@@ -879,14 +636,8 @@ BoldFont = *-Regular
 	
 	\begin{frame}{Pour aller plus loin (en ordre)}
 		\begin{itemize}
-			\item \href{https://www.oreilly.com/library/view/clean-code-a/9780136083238/}{Clean code}
-			\item \href{https://github.com/iterative/cml}{Continuous Machine Learning}
-			\item \href{https://determined.ai/blog/reproducibility-in-ml/}{Reproducibility in ML: Why it Matters and How to Achieve it}
-			\item Faire des tests!
-			\item Writing Code for NLP Research \cite{gardner-etal-2018-writing}
-			\item \textit{Improving Reproducibility in Machine Learning Research (A Report from the NeurIPS 2019 Reproducibility Program} \cite{pineau2020improving}
-			\item \href{https://sebastianraschka.com/blog/2018/model-evaluation-selection-part4.html}{Model Evaluation, Model Selection, and Algorithm Selection in Machine Learning}
-			\item \href{https://www.youtube.com/watch?v=t86v3N4OshQ&list=LLFp5G_2HoipBrGaw9iAcPPw&index=693}{SOLID}
+			\item Notification de l'état d'entrainement \link{https://notificationdoc.ca/}{Notif}
+			\item \link{https://cml.dev/}{Continuous Machine Learning (CML)} 
 		\end{itemize}
 	\end{frame}
 	
@@ -904,7 +655,7 @@ BoldFont = *-Regular
 	\begin{frame}[t, allowframebreaks]
 		\frametitle{References}
 		\bibliographystyle{apalike}
-		\bibliography{RAA}
+		\bibliography{GECR}
 	\end{frame}
 	
 	
