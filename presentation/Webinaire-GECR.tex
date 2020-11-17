@@ -239,39 +239,41 @@ BoldFont = *-Regular
 	
 	\section{La gestion d'un projet}
 	\begin{frame}{Gestion des paramètres de configuration}
-		\begin{Scode}
-			@experiment.config \\
-			def config(): \\
-			\quad	seed = 42 \\
-			\quad	num\_runs = 10 \\
-			\quad	iteration = 0 \\
-			\quad	source\_language = "en" \\
-			\quad	target\_language = "de" \\
-			\quad 	src\_input = "path"  \# The input source embeddings \\
-			\quad 	trg\_input = "2e path" \# The input target embeddings \\
-			\quad 	other\_input = "3e path" \# Commentaire pas clair \\
-			\quad   $\vdots$ \\
-			\quad   (ligne 500) $n^e$ paramètre \\
+		\begin{Scode} %% Camille : Correction du "line numbering"
+			$001 \qquad$ @experiment.config \\
+			$002 \qquad$ def config(): \\
+			$003 \qquad$ \quad	seed = 42 \\
+			$004 \qquad$ \quad	num\_runs = 10 \\
+			$005 \qquad$ \quad	iteration = 0 \\
+			$006 \qquad$ \quad	source\_language = "en" \\
+			$007 \qquad$ \quad	target\_language = "de" \\
+			$008 \qquad$ \quad 	src\_input = "path"  \# The input source embeddings \\
+			$009 \qquad$ \quad 	trg\_input = "2e path" \# The input target embeddings \\
+			$010 \qquad$ \quad 	other\_input = "3e path" \# Commentaire pas clair \\
+			$\:\:\: \qquad$ \quad   $\vdots$ \\
+			$395 \qquad$ \quad   $n^e$ paramètre \\
 		\end{Scode}
 	\end{frame}
 
-	\begin{frame}{Gestion des paramètres de configuration}
+	\begin{frame}{Gestion des paramètres de configuration} %% Camille : retrait des mots inutiles
 		\centering
 		\uncover<1->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Quel paramètre fait ça déjà?
+				\normalsize Lequel fait ça déjà?
 		\end{minipage}}
 		\uncover<2->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Quels paramètres sont nécessairement ensemble?
+				\normalsize Lesquels vont nécessairement ensemble?
 		\end{minipage}}
 		\uncover<3->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Sont-ils tous essentiels?
+				\normalsize Lesquels sont vraiment essentiels?
 		\end{minipage}}
 		\uncover<4->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Comment doit-on se retrouver dans le projet?
+				\normalsize Comment les organiser ?
+				%doit-on se retrouver dans le projet? 
+				%% Camille : Je ne suis pas certain de celui-ci, si c'Est vraiment ce que tu voulais dire ... 
 		\end{minipage}}
 	\end{frame}
 
@@ -292,23 +294,23 @@ BoldFont = *-Regular
 		\end{Scode}
 	\end{frame}
 
-	\begin{frame}{Gestion des résultats}
+	\begin{frame}{Gestion des résultats} %% Camille : tentative de raccourcir pour éviter la lecture
 		\centering
 		\uncover<1->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Quelle configuration déjà avec ces résultats?
+				\normalsize Quelle configuration (déjà) utilisée ? % Quelle configuration déjà avec ces résultats?
 		\end{minipage}}
 		\uncover<2->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Est-ce un succès ou un échec cet entrainement?
+				\normalsize Succès ou échec ? % Est-ce un succès ou un échec cet entrainement?
 		\end{minipage}}
 		\uncover<3->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Lequel contient mes meilleurs résultats?
+				\normalsize Lequel est le meilleur ? % Lequel contient mes meilleurs résultats?
 		\end{minipage}}
 		\uncover<4->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Comment doit-on se retrouver dans les résultats?
+				\normalsize Comment les organiser ?  % Comment doit-on se retrouver dans les résultats?
 		\end{minipage}}
 	\end{frame}
 
@@ -601,22 +603,25 @@ BoldFont = *-Regular
 
 
 	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
-		La version de \guillemet{base} implique de
+		La version de \guillemet{base} implique de journaliser manuellement % Camille : Factorisation du texte :P 
 		\begin{itemize}
-			\item journaliser manuellement les paramètres de configuration,
-			\item journaliser manuellement les métriques à chaque étape et itération,
-			\item journaliser manuellement la version du code.
+			\item les paramètres de configuration,
+			\item les métriques à chaque étape et itération,
+			\item la version du code.
+			% \item journaliser manuellement les paramètres de configuration,
+			% \item journaliser manuellement les métriques à chaque étape et itération,
+			% \item journaliser manuellement la version du code.
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
-		La solution, \color{bleu}MLFlowWriter\color{couleurpolice}, un \textit{callback} permettant de
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}} % Camille : Factorisation du texte again
+		La solution, \color{bleu}MLFlowWriter\color{couleurpolice}, un \textit{callback} permettant de journaliser 
 		\begin{itemize}
-			\item journaliser semi-automatiquement les paramètres de configuration,
-			\item journaliser automatiquement les métriques à chaque étape et itération,
-			\item journaliser automatiquement la version du code,
-			\item journaliser manuellement un modèle,
-			\item journaliser automatiquement les métriques de test lors d'une phase de test.
+			\item semi-automatiquement les paramètres de configuration,
+			\item automatiquement les métriques à chaque étape et itération,
+			\item automatiquement la version du code,
+			\item manuellement un modèle,
+			\item automatiquement les métriques de test lors d'une phase de test.
 		\end{itemize}
 	\end{frame}
 
