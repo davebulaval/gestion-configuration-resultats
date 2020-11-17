@@ -239,7 +239,7 @@ BoldFont = *-Regular
 	
 	\section{La gestion d'un projet}
 	\begin{frame}{Gestion des paramètres de configuration}
-		\begin{Scode} %% Camille : Correction du "line numbering"
+		\begin{Scode} 
 			$001 \qquad$ @experiment.config \\
 			$002 \qquad$ def config(): \\
 			$003 \qquad$ \quad	seed = 42 \\
@@ -255,7 +255,7 @@ BoldFont = *-Regular
 		\end{Scode}
 	\end{frame}
 
-	\begin{frame}{Gestion des paramètres de configuration} %% Camille : retrait des mots inutiles
+	\begin{frame}{Gestion des paramètres de configuration}
 		\centering
 		\uncover<1->{\begin{minipage}{0.24\linewidth}
 				\centering
@@ -272,8 +272,6 @@ BoldFont = *-Regular
 		\uncover<4->{\begin{minipage}{0.24\linewidth}
 				\centering
 				\normalsize Comment les organiser ?
-				%doit-on se retrouver dans le projet? 
-				%% Camille : Je ne suis pas certain de celui-ci, si c'Est vraiment ce que tu voulais dire ... 
 		\end{minipage}}
 	\end{frame}
 
@@ -294,23 +292,23 @@ BoldFont = *-Regular
 		\end{Scode}
 	\end{frame}
 
-	\begin{frame}{Gestion des résultats} %% Camille : tentative de raccourcir pour éviter la lecture
+	\begin{frame}{Gestion des résultats}
 		\centering
 		\uncover<1->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Quelle configuration (déjà) utilisée ? % Quelle configuration déjà avec ces résultats?
+				\normalsize Quelle configuration (déjà) utilisée ?
 		\end{minipage}}
 		\uncover<2->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Succès ou échec ? % Est-ce un succès ou un échec cet entrainement?
+				\normalsize Succès ou échec ?
 		\end{minipage}}
 		\uncover<3->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Lequel est le meilleur ? % Lequel contient mes meilleurs résultats?
+				\normalsize Lequel est le meilleur ?
 		\end{minipage}}
 		\uncover<4->{\begin{minipage}{0.24\linewidth}
 				\centering
-				\normalsize Comment les organiser ?  % Comment doit-on se retrouver dans les résultats?
+				\normalsize Comment les organiser ?
 		\end{minipage}}
 	\end{frame}
 
@@ -449,6 +447,14 @@ BoldFont = *-Regular
 		\end{Scode}
 	\end{frame}
 
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad lr = cfg.optimizer.lr \#0.1
+		\end{Scode}
+	\end{frame}
+
 	\begin{frame}{Balayage de configurations}
 			
 			\begin{Scode}
@@ -466,13 +472,24 @@ BoldFont = *-Regular
 			\item Journalisation automatique et personnalisable
 			\item Instanciation paramétrique 
 			\begin{Scode}
-				\# @package \_group\_ \\
-				\quad \_target\_: my\_app.MySQLConnection \\
-				\quad host: localhost \\
-				\quad user: root \\
-				\quad password: 1234 \\
+				model: \\
+				\quad \_target\_: models.LSTMNetwork \\
+				\quad hidden\_state\_dim: 300 \\
+				\quad num\_hidden\_layer: 2 \\
+				\quad dropout: 0.4 \\
 			\end{Scode}
 		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			log = logging.getLogger(\_\_name\_\_) \\
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad log.info("Init of the trainning") \\
+			\quad \vdots \\
+			\quad network = instantiate(cfg.model)
+		\end{Scode}
 	\end{frame}
 
 	\begin{frame}{Point négatif}
@@ -546,7 +563,7 @@ BoldFont = *-Regular
 			\centering
 			\fontsize{35}{35}\faIcon{cogs}\vfil
 			\vspace{1em}
-			\normalsize Suivie automatique de paramètres d'entrainement
+			\normalsize Journalisation automatique
 		\end{minipage}
 		\begin{minipage}{0.24\linewidth}
 			\centering
@@ -564,7 +581,7 @@ BoldFont = *-Regular
 		}
 	\end{frame}
 
-	\begin{frame}{Suivie automatique de paramètres d'entrainement}
+	\begin{frame}{Journalisation automatique}
 		\begin{itemize}
 			\item Version du code (\faGit)*
 			\item Horodatage de l'entrainement
@@ -597,24 +614,21 @@ BoldFont = *-Regular
 			\item Recherche des expérimentations
 			\item Requêtes sur les résultats
 			\item Exportation des résultats
-			\item Visualisation les métriques
+			\item Visualisation des métriques
 		\end{itemize}
 	\end{frame}
 
 
 	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
-		La version de \guillemet{base} implique de journaliser manuellement % Camille : Factorisation du texte :P 
+		La version de \guillemet{base} implique de journaliser manuellement 
 		\begin{itemize}
 			\item les paramètres de configuration,
 			\item les métriques à chaque étape et itération,
 			\item la version du code.
-			% \item journaliser manuellement les paramètres de configuration,
-			% \item journaliser manuellement les métriques à chaque étape et itération,
-			% \item journaliser manuellement la version du code.
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}} % Camille : Factorisation du texte again
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
 		La solution, \color{bleu}MLFlowWriter\color{couleurpolice}, un \textit{callback} permettant de journaliser 
 		\begin{itemize}
 			\item semi-automatiquement les paramètres de configuration,
@@ -623,6 +637,18 @@ BoldFont = *-Regular
 			\item manuellement un modèle,
 			\item automatiquement les métriques de test lors d'une phase de test.
 		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad \vdots \\
+			\quad mlflow\_logger = MLFlowLogger(experiment\_name="experiment") \\
+			\quad mlflow\_logger.log\_config\_params(config\_params=cfg) \\
+			\quad \vdots \\
+			\quad mlflow\_logger.log\_model()\\
+		\end{Scode}
 	\end{frame}
 
 	\begin{frame}{Point négatif}
