@@ -7,7 +7,7 @@ David est candidat au Doctorat en Informatique à l'Université Laval cumulant u
 > Le code source de la présentation se situe dans le répertoire `presentation/fr`. 
 
 
-# Configuration and results management with MLflow, Hydra and Poutyne
+# Configuration and Results Management with MLflow, Hydra and Poutyne
 
 This webinar introduces tools that facilitate good practices for configuration and results management in a "repeatable research" context in machine learning. These tools will help improve your work methods and productivity.
 
