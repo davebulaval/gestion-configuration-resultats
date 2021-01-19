@@ -58,6 +58,11 @@
   \OverpassSemiBold\bfseries\fontsize{18}{18}\selectfont
   WEBINAIRE}
 
+\def\site{%
+	\OverpassLight\fontsize{4.5}{4.5}\selectfont%
+	\bfseries\textcolor{black}{davebulaval.github.io/gestion-configuration-resultats}}
+
+
 %%%
 %%% Page de titre
 %%%
@@ -67,6 +72,11 @@
     \textcolor{rouge}{\rule{\banderougewidth}{\banderougeheight}}% % bande rouge
     \textcolor{bleu}{\rule{\bandeorwidth}{\bandeorheight}}           % bande or
   \end{textblock*}
+
+		%% website link
+	\begin{textblock*}{5\TPHorizModule}[0,0.5](0.7\TPHorizModule,59.7\TPVertModule)
+		\site
+	\end{textblock*}
 
   %% identifiant «webinaire»
 	\begin{textblock*}{2\TPHorizModule}(0.7\TPHorizModule,5\TPVertModule)

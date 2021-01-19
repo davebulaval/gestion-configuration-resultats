@@ -61,9 +61,13 @@
   \OverpassExtraLightBold\bfseries\fontsize{14}{14}\selectfont%
   JANUARY 19, 2021}
 
+\def\site{%
+	\OverpassLight\fontsize{4.5}{4.5}\selectfont%
+	\bfseries\textcolor{black}{davebulaval.github.io/gestion-configuration-resultats}}
+
 %%%
 %%% Page de titre
-%%%
+%%%https://davebulaval.github.io/gestion-configuration-resultats/
 \begin{frame}[plain]
   %% bandeau identitaire
   \begin{textblock*}{\paperwidth}[0,1](0mm,56\TPVertModule)
@@ -71,10 +75,16 @@
     \textcolor{bleu}{\rule{\bandeorwidth}{\bandeorheight}}
   \end{textblock*}
 
+	%% website link
+	\begin{textblock*}{5\TPHorizModule}[0,0.5](0.7\TPHorizModule,59.7\TPVertModule)
+		\site
+	\end{textblock*}
+
   %% identifiant «webinaire»
   \begin{textblock*}{2\TPHorizModule}(0.7\TPHorizModule,5\TPVertModule)
     \textcolor[rgb]{0.13,0.13,0.13}{\webinaire}
   \end{textblock*}
+
 
   %% titre
   \begin{textblock*}{12\TPHorizModule}(0.7\TPHorizModule,17\TPVertModule)
