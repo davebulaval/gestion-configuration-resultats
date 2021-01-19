@@ -364,6 +364,27 @@ BoldFont = *-Regular
 		}
 		
 	\end{frame}
+
+	\begin{frame}
+		\frametitle{Solutions possible}
+		\centering
+		\begin{itemize}
+			\item Arguments (e.g. argsparse, configparser)
+			\item Fichier texte
+			\item JSON
+			\item YAML
+			\item $\hdots$
+		\end{itemize}
+		\note{
+			1. nice when a couple of arguments (but difficult to scale, to read and maintain)
+			2. Ok to read but need to be parse
+			3. Cannot have comments, ok to read, sort of structured but difficult to read with that
+			4. Easy to read, comments, structured
+			
+			The main drawback on these approaches is the lack of hierachical logic. 
+		}
+		
+	\end{frame}
 	
 	\begin{frame}
 		\frametitle{\link{https://hydra.cc/}{Hydra}}
@@ -397,8 +418,26 @@ BoldFont = *-Regular
 		\note{
 		}
 	\end{frame}
-	
+
 	\begin{frame}{Configuration structuré}
+		\begin{Scode}
+			data\_loader: \\
+			\quad	batch\_size: 2048 \\
+			setting: \\
+			\quad seed: 42 \\
+			\quad device: "cuda:0" \\
+			defaults: \\
+			\quad - optimizer: SGD \\
+			\quad - model: bi\_lstm \\
+			\quad - dataset: canadian \\
+			\quad - embeddings: fast\_text \\
+			trainer: \\
+			\quad num\_epochs: 1 \\
+			\quad patience: 30 \\
+		\end{Scode}
+	\end{frame}
+	
+	\begin{frame}{Configuration hiérarchique}
 		\begin{Scode}
 			\dirtree{%
 				.1 conf.
@@ -417,24 +456,6 @@ BoldFont = *-Regular
 				.3 adam.yaml.
 				.3 SGD.yaml.
 			}
-		\end{Scode}
-	\end{frame}
-
-	\begin{frame}{Configuration hiérarchique}
-		\begin{Scode}
-			data\_loader: \\
-			\quad	batch\_size: 2048 \\
-			setting: \\
-			\quad seed: 42 \\
-			\quad device: "cuda:0" \\
-			defaults: \\
-			\quad - optimizer: SGD \\
-			\quad - model: bi\_lstm \\
-			\quad - dataset: canadian \\
-			\quad - embeddings: fast\_text \\
-			trainer: \\
-			\quad num\_epochs: 1 \\
-			\quad patience: 30 \\
 		\end{Scode}
 	\end{frame}
 

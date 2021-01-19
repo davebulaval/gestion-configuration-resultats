@@ -251,7 +251,7 @@ BoldFont = *-Regular
 			$009 \qquad$ \quad 	trg\_input = "2e path" \# The input target embeddings \\
 			$010 \qquad$ \quad 	other\_input = "3e path" \# Commentaire pas clair \\
 			$\:\:\: \qquad$ \quad   $\vdots$ \\
-			$395 \qquad$ \quad   $n^{th}$ parameters \\
+			$395 \qquad$ \quad   $n$-th parameters \\
 		\end{Scode}
 	\end{frame}
 
@@ -287,7 +287,7 @@ BoldFont = *-Regular
 			.2 res\_5.txt.
 			.2 res\_6\_fix\_a.txt.
 			.2 $\vdots$.
-			.2 $n^{th}$ results file.
+			.2 $n$-th results file.
 		}
 		\end{Scode}
 	\end{frame}
@@ -366,6 +366,27 @@ BoldFont = *-Regular
 	\end{frame}
 	
 	\begin{frame}
+		\frametitle{Possible solutions}
+		\centering
+		\begin{itemize}
+			\item Arguments (e.g. argsparse, configparser)
+			\item Text file
+			\item JSON
+			\item YAML
+			\item $\hdots$
+		\end{itemize}
+		\note{
+			1. nice when a couple of arguments (but difficult to scale, to read and maintain)
+			2. Ok to read but need to be parse
+			3. Cannot have comments, ok to read, sort of structured but difficult to read with that
+			4. Easy to read, comments, structured
+			
+			The main drawback on these approaches is the lack of hierachical logic. 
+		}
+
+	\end{frame}
+	
+	\begin{frame}
 		\frametitle{\link{https://hydra.cc/}{Hydra}}
 		\framesubtitle{\textit{A framework for elegantly configuring complex applications}}
 		
@@ -397,8 +418,26 @@ BoldFont = *-Regular
 		\note{
 		}
 	\end{frame}
-	
+
 	\begin{frame}{Structured configuration}
+		\begin{Scode}
+			data\_loader: \\
+			\quad	batch\_size: 2048 \# the batch size\\
+			setting: \\
+			\quad seed: 42 \\
+			\quad device: "cuda:0" \\
+			defaults: \\
+			\quad - optimizer: SGD \\
+			\quad - model: bi\_lstm \\
+			\quad - dataset: canadian \\
+			\quad - embeddings: fast\_text \\
+			trainer: \\
+			\quad num\_epochs: 1 \\
+			\quad patience: 30 \\
+		\end{Scode}
+	\end{frame}
+	
+	\begin{frame}{Hierarchical configuration}
 		\begin{Scode}
 			\dirtree{%
 				.1 conf.
@@ -418,24 +457,7 @@ BoldFont = *-Regular
 				.3 SGD.yaml.
 			}
 		\end{Scode}
-	\end{frame}
-
-	\begin{frame}{Hierarchical configuration}
-		\begin{Scode}
-			data\_loader: \\
-			\quad	batch\_size: 2048 \\
-			setting: \\
-			\quad seed: 42 \\
-			\quad device: "cuda:0" \\
-			defaults: \\
-			\quad - optimizer: SGD \\
-			\quad - model: bi\_lstm \\
-			\quad - dataset: canadian \\
-			\quad - embeddings: fast\_text \\
-			trainer: \\
-			\quad num\_epochs: 1 \\
-			\quad patience: 30 \\
-		\end{Scode}
+	\note{Logic are grouped together and are capture in a hierarchical maners. config files/directory of config files have "one responsability".}
 	\end{frame}
 
 	\begin{frame}{Hierarchical configuration}
