@@ -17,6 +17,8 @@ This webinar introduces tools that facilitate good practices for configuration a
 ## Covered Topics
  - Configuration management
  - Results management
+ 
+[Video of the seminar](https://youtu.be/N2wGTG3omz0)
 
  
 ## Author and Speaker
