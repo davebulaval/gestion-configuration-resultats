@@ -1,4 +1,4 @@
-## Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne
+## Gestion de la configuration et des résultats avec MLflow/Weights and Biases, Hydra et Poutyne
 
 Ce webinaire se veut une introduction aux outils facilitant de bonnes pratiques de gestion de la configuration et des résultats dans un contexte de « recherche reproductible » en apprentissage automatique. Ces outils contribueront à améliorer vos méthodes de travail et votre productivité
 

@@ -1,0 +1,842 @@
+%%% Copyright (C) 2020 David Beauchemin
+%%%
+%%% Ce fichier et tous les fichiers .tex dont la racine est
+%%% mentionnée dans les commandes \include et \input ci-dessous font
+%%% partie du projet «Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne
+%%% - Webinaire»
+%%% URL
+%%%
+%%% Le format et le visuel est très fortement inspiré du matériel de
+%%% Vincent Goulet https://gitlab.com/vigou3/webinaire-recherche-reproductible
+%%%
+%%% Cette création est mise à disposition selon le contrat
+%%% Attribution-Partage dans les mêmes conditions 4.0
+%%% International de Creative Commons.
+%%% https://creativecommons.org/licenses/by-sa/4.0/
+
+\documentclass[aspectratio=169,10pt,xcolor=x11names,english,french]{beamer}
+\usepackage{babel}
+\usepackage[autolanguage]{numprint}
+\usepackage{amsmath}
+\usepackage{currfile}                  % nom fichier de script
+\usepackage{changepage}                % page licence
+\usepackage{tabularx}                  % page licence
+\usepackage{relsize}                   % \smaller et al.
+\usepackage{awesomebox}                % boites signalétiques
+\usepackage{fancyvrb}                  % texte verbatim
+\usepackage{framed}                    % env. leftbar
+\usepackage{pict2e}                    % cycle travail Git
+\usepackage[overlay,absolute]{textpos} % couvertures
+\usepackage{metalogo}       
+\usepackage{textpos}           % logo \XeLaTeX
+
+\usepackage{fontawesome}
+
+\usepackage{stackengine, tikz} % for stacking logo
+
+\usepackage{svg} %for svg image also need option --shell-escape
+
+\usepackage{dirtree}
+
+
+%% =============================
+%%  Informations de publication
+%% =============================
+\title{Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne}
+\author{David Beauchemin}
+\date{.. novembre 2020}
+
+%% =======================
+%%  Apparence du document
+%% =======================
+
+%% Couleurs additionnelles
+\definecolor{rouge}{rgb}{1,0.31,0.26}
+\definecolor{bleu}{rgb}{0.18,0.23,1}
+\definecolor{couleurpolice}{rgb}{0.13,0.13,0.13}
+
+\definecolor{link}{cmyk}{0.67, 0.66, 0, 0.71}    % liens internes
+\definecolor{url}{rgb}{1,0.31,0.26}       % liens externes
+\definecolor{codebg}{rgb}{0.94, 0.95, 0.95}
+
+\colorlet{shadecolor}{codebg}
+
+%% Thème Beamer général
+\usetheme[titleformat=allcaps, numbering=none, block=transparent]{metropolis}
+
+%% Modifications aux couleurs: fond blanc, titres en texte noir sur
+%% fond blanc
+\setbeamercolor{normal text}{bg=white}
+\setbeamercolor{frametitle}{fg=normal text.fg, bg=}
+
+%% Déplacer les titres vers le bas sous la décoration du gabarit CFDD
+\makeatletter
+\setlength{\metropolis@frametitle@padding}{4.9ex}
+\renewcommand{\metropolis@frametitlestrut@start}{
+	\rule{0pt}{6ex +%
+		\totalheightof{%
+			\ifcsdef{metropolis@frametitleformat}{\metropolis@frametitleformat X}{X}%
+		}%
+	}
+}
+\renewcommand{\metropolis@frametitlestrut@end}{}
+\makeatother
+
+%% Format de la page de titre de section;
+\makeatletter
+
+\setbeamertemplate{section page}{%
+	\begin{minipage}{22em}
+		\raggedright
+		\usebeamerfont{section title}
+		\let\hyperlink\@secondoftwo\fontsize{35}{35}\textcolor[cmyk]{0.67, 0.66, 0, 0.71}{\insertsectionhead}\par
+	\end{minipage}
+	\par
+	\vspace{\baselineskip}
+}
+
+\makeatother
+
+%% Polices de caractères
+\newfontfamily\Overpass{Overpass}
+\setsansfont{Overpass}        % police principale
+\newfontfamily\OverpassSemiBold{Overpass}
+[
+BoldFont = *-SemiBold
+]
+\newfontfamily\OverpassExtraLightBold{Overpass}
+[
+UprightFont = *-ExtraLight,
+BoldFont = *-Light
+]
+\newfontfamily\OverpassLight{Overpass}
+[
+UprightFont = *-Light,
+BoldFont = *-Regular
+]
+
+
+\setbeamercolor{frametitle}{fg=couleurpolice}
+\setbeamercolor{section in head/foot}{fg=couleurpolice}
+\setbeamercolor{normal text}{fg=couleurpolice}
+
+
+
+%% Hyperliens
+\hypersetup{%
+	pdfauthor = {David Beauchemin},
+	pdftitle = {Gestion de la configuration et des résultats avec MLflow, Hydra et Poutyne},
+	colorlinks = {true},
+	linktocpage = {true},
+	allcolors = {link},
+	urlcolor = {url},
+	pdfpagemode = {UseOutlines},
+	pdfstartview = {Fit},
+	bookmarksopen = {true},
+	bookmarksnumbered = {true},
+	bookmarksdepth = {subsection}}
+
+%% Paramétrage de babel pour les guillemets
+\frenchbsetup{og=«, fg=»}
+
+%% =========================
+%%  Nouveaux environnements
+%% =========================
+
+%% Environnement pour le code informatique; hybride
+%% des environnements snugshade* et leftbar de framed.
+\makeatletter
+\newenvironment{Scode}{%
+	\def\FrameCommand##1{\hskip\@totalleftmargin
+		\vrule width 3pt\colorbox{codebg}{\hspace{5pt}##1}%
+		% There is no \@totalrightmargin, so:
+		\hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+	\MakeFramed {\advance\hsize-\width
+		\@totalleftmargin\z@ \linewidth\hsize
+		\advance\labelsep\fboxsep
+		\@setminipage}%
+}{\par\unskip\@minipagefalse\endMakeFramed}
+\makeatother
+
+%% Environnement pour le contenu d'un fichier; alias de snugshade*.
+\newenvironment{Sfile}{\begin{snugshade*}}{\end{snugshade*}}
+
+%% =====================
+%%  Nouvelles commandes
+%% =====================
+
+%% Lien externe
+\newcommand{\link}[2]{\href{#1}{#2~{\smaller\faExternalLink*}}}
+\newcommand{\guillemet}[1]{\guillemotleft #1 \guillemotright}
+
+%% Simili commande \HUGE
+\newcommand{\HUGE}{\fontsize{36}{36}\selectfont}
+
+%%% =======
+%%%  Varia
+%%% =======
+
+%% Longueurs pour la composition des pages couvertures avant et
+%% arrière
+\newlength{\banderougewidth} \newlength{\banderougeheight}
+\newlength{\bandeorwidth}    \newlength{\bandeorheight}
+\newlength{\imageheight}     \newlength{\imagewidth}
+\newlength{\logoheight}
+
+\begin{document}
+	
+	%% Style de l'entête et du pied de page
+	
+	%% frontmatter
+	\input{couverture-avant}
+	
+	\begin{frame}{Objectifs de la présentation}
+		\begin{itemize}
+			\item Initier aux outils de gestion de la configuration et des résultats.
+			\item Développer de bonnes pratiques.
+			\item Améliorer votre productivité.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Votre conférencier}
+		
+		\begin{minipage}{0.25\linewidth}
+			\includegraphics[width=\linewidth,keepaspectratio]{img/david}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.70\linewidth}
+			\begin{itemize}
+				\item Introduit à la recherche reproductible en 2016 (\mbox{R Markdown} et \faGit)
+				\item Participation à REPROLANG de la conférence LREC \cite{garneau2020robust}
+				\item Membre actif dans le développement d'une librairie facilitant la reproductibilité (\link{https://poutyne.org/}{Poutyne})
+			\end{itemize}
+		\end{minipage}
+		
+		\begin{minipage}{0.25\linewidth}
+			\small
+			\textbf{DAVID BEAUCHEMIN} \\
+			Candidat au doctorat \\
+			Département d'informatique et de génie logiciel
+		\end{minipage}
+	\end{frame}
+
+	\begin{frame}{Au menu}
+		\begin{minipage}{0.49\linewidth}
+				\centering
+				\fontsize{35}{35}\faCog\vfil
+				\vspace{1em}
+				\normalsize Gestion de la configuration
+				
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+				\centering
+				\fontsize{35}{35}\faAreaChart\vfil
+				\vspace{1em}
+				\normalsize Gestion des résultats
+		\end{minipage}
+	\end{frame}
+	
+	\section{La gestion d'un projet}
+	\begin{frame}{Gestion des paramètres de configuration}
+		\begin{Scode} 
+			$001 \qquad$ @experiment.config \\
+			$002 \qquad$ def config(): \\
+			$003 \qquad$ \quad	seed = 42 \\
+			$004 \qquad$ \quad	num\_runs = 10 \\
+			$005 \qquad$ \quad	iteration = 0 \\
+			$006 \qquad$ \quad	source\_language = "en" \\
+			$007 \qquad$ \quad	target\_language = "de" \\
+			$008 \qquad$ \quad 	src\_input = "path"  \# The input source embeddings \\
+			$009 \qquad$ \quad 	trg\_input = "2e path" \# The input target embeddings \\
+			$010 \qquad$ \quad 	other\_input = "3e path" \# Commentaire pas clair \\
+			$\:\:\: \qquad$ \quad   $\vdots$ \\
+			$395 \qquad$ \quad   $n^e$ paramètre \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Gestion des paramètres de configuration}
+		\centering
+		\uncover<1->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Lequel fait ça déjà?
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Lesquels vont nécessairement ensemble?
+		\end{minipage}}
+		\uncover<3->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Lesquels sont vraiment essentiels?
+		\end{minipage}}
+		\uncover<4->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Comment les organiser ?
+		\end{minipage}}
+	\end{frame}
+
+	\begin{frame}{Gestion des résultats}
+		\begin{Scode}
+			\dirtree{%
+			.1 .
+			.2 res\_1.txt.
+			.2 res\_2.txt.
+			.2 res\_3.txt.
+			.2 res\_4.txt.
+			.2 res\_5\_good.txt.
+			.2 res\_5.txt.
+			.2 res\_6\_fix\_a.txt.
+			.2 $\vdots$.
+			.2 $n^e$ fichier de résultats.
+		}
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Gestion des résultats}
+		\centering
+		\uncover<1->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Quelle configuration (déjà) utilisée ?
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Succès ou échec ?
+		\end{minipage}}
+		\uncover<3->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Lequel est le meilleur ?
+		\end{minipage}}
+		\uncover<4->{\begin{minipage}{0.24\linewidth}
+				\centering
+				\normalsize Comment les organiser ?
+		\end{minipage}}
+	\end{frame}
+
+	
+	\section{Les solutions}
+	
+	\begin{frame}{Au menu}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\fontsize{35}{35}\faCog
+			\vfil
+			\vspace{1em}
+			\normalsize Gestion de la configuration
+			
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faAreaChart};
+			\vfil
+			\vspace{1em}
+			\tikz\node[opacity=0.5]{\normalsize Gestion des résultats};
+		\end{minipage}
+	\end{frame}
+
+	\begin{frame}{Gestion de la configuration}
+		\centering
+		\uncover<1->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faForward\vfil
+				\vspace{1em}
+				\normalsize Simple et efficace
+		\end{minipage}}
+		\uncover<2->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faFlask\vfil
+				\vspace{1em}
+				\normalsize Facilite l'expérimentation
+		\end{minipage}}
+		\uncover<3->{\begin{minipage}{0.32\linewidth}
+				\centering
+				\fontsize{35}{35}\faLineChart\vfil
+				\vspace{1em}
+				\normalsize Extensible
+		\end{minipage}}
+		\note{
+			On cherche une solution qui va être :
+			
+			simple et efficace pour gérer nos configurations,
+			
+			qui va faciliter l'expérimentation plutôt que la ralentir,
+			
+			extensible pour permettre la définition de plusieurs paramètres tout en étant concis.
+		}
+		
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{Solutions possible}
+		\centering
+		\begin{itemize}
+			\item Arguments (e.g. argsparse, configparser)
+			\item Fichier texte
+			\item JSON
+			\item YAML
+			\item $\hdots$
+		\end{itemize}
+		\note{
+			1. nice when a couple of arguments (but difficult to scale, to read and maintain)
+			2. Ok to read but need to be parse
+			3. Cannot have comments, ok to read, sort of structured but difficult to read with that
+			4. Easy to read, comments, structured
+			
+			The main drawback on these approaches is the lack of hierachical logic. 
+		}
+		
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{\link{https://hydra.cc/}{Hydra}}
+		\framesubtitle{\textit{A framework for elegantly configuring complex applications}}
+		
+		\centering
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faIcon{osi}\vfil
+				\vspace{1em}
+				\normalsize \textit{Open source} et licence MIT
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faFile\vfil
+				\vspace{1em}
+				\normalsize Fichiers de configurations structurés YAML
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+				\centering
+				\fontsize{35}{35}\faIcon{cubes}\vfil
+				\vspace{1em}
+				\normalsize Fichiers de configurations hiérarchiques
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faCogs\vfil
+			\vspace{1em}
+			\normalsize Balayage de configurations
+		\end{minipage}
+		\note{
+		}
+	\end{frame}
+
+	\begin{frame}{Configuration structuré}
+		\begin{Scode}
+			data\_loader: \\
+			\quad	batch\_size: 2048 \\
+			setting: \\
+			\quad seed: 42 \\
+			\quad device: "cuda:0" \\
+			defaults: \\
+			\quad - optimizer: SGD \\
+			\quad - model: bi\_lstm \\
+			\quad - dataset: canadian \\
+			\quad - embeddings: fast\_text \\
+			trainer: \\
+			\quad num\_epochs: 1 \\
+			\quad patience: 30 \\
+		\end{Scode}
+	\end{frame}
+	
+	\begin{frame}{Configuration hiérarchique}
+		\begin{Scode}
+			\dirtree{%
+				.1 conf.
+				.2 config.yaml.
+				.2 dataset.
+				.3 canadian.yaml.
+				.3 netherlands.yaml.
+				.2 embeddings.
+				.3 fast\_text.yaml.
+				.2 model.
+				.3 bi\_lstm\_bidirectionnal.yaml.
+				.3 bi\_lstm.yaml.
+				.3 lstm\_bidirectionnal.yaml.
+				.3 lstm.yaml.
+				.2 optimizer.
+				.3 adam.yaml.
+				.3 SGD.yaml.
+			}
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Configuration hiérarchique}
+		optimizer: SGD
+		\begin{Scode}
+			optimizer: \\
+			\quad lr: 0.1 \\
+			\quad type: sgd \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad lr = cfg.optimizer.lr \#0.1
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Balayage de configurations}
+			
+			\begin{Scode}
+				python main.py --multirun task=1,2,3,4,5
+			\end{Scode}
+			
+			\begin{Scode}
+				python main.py -m 'main.x=int(interval(-5, 5))' 'main.y=interval(-5, 10)'
+			\end{Scode}
+		\note{Plusieurs choix de sweeper Ax, Joblib, Nevergrad}
+	\end{frame}
+
+	\begin{frame}{En bonus}
+		\begin{itemize}
+			\item Journalisation automatique et personnalisable
+			\item Instanciation paramétrique 
+			\begin{Scode}
+				model: \\
+				\quad \_target\_: models.LSTMNetwork \\
+				\quad hidden\_state\_dim: 300 \\
+				\quad num\_hidden\_layer: 2 \\
+				\quad dropout: 0.4 \\
+			\end{Scode}
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			log = logging.getLogger(\_\_name\_\_) \\
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad log.info("Init of the trainning") \\
+			\quad \vdots \\
+			\quad network = instantiate(cfg.model)
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Point négatif}
+		\begin{Scode}
+			hydra.utils.get\_original\_cwd()
+		\end{Scode}
+	\note{En raison de la journalisation automatique, le working directory change.}
+	\end{frame}
+
+	\begin{frame}{Au menu}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\tikz\node[opacity=0.5]{\fontsize{35}{35}\faCog};
+			\vfil
+			\vspace{1em}
+			\tikz\node[opacity=0.5]{\normalsize Gestion de la configuration};
+			
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+			\centering
+			\fontsize{35}{35}\faAreaChart
+			\vfil
+			\vspace{1em}
+			\normalsize Gestion des résultats
+		\end{minipage}
+	\end{frame}
+
+	\begin{frame}{Gestion des résultats}
+	\centering
+	\uncover<1->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{user-check}\vfil
+			\vspace{1em}
+			\normalsize Simple à utiliser
+	\end{minipage}}
+	\uncover<2->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{archive}\vfil
+			\vspace{1em}
+			\normalsize Journalisation des expérimentations
+	\end{minipage}}
+	\uncover<3->{\begin{minipage}{0.32\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation rapide des expérimentations
+	\end{minipage}}
+	\note{
+		On cherche une solution qui va être :
+		
+		simple à utiliser et \textit{utilisateur ready},
+		
+		qui va journaliser \textbf{intelligemment} nos expérimentations,
+		
+		qui permet de visualiser rapidement nos expérimentations et les comparer.
+	}
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{\link{https://mlflow.org/}{MLflow Tracking}}
+		\framesubtitle{\textit{An open source platform for the machine learning lifecycle}}
+		
+		\centering
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{osi}\vfil
+			\vspace{1em}
+			\normalsize \textit{Open source} et licence Apache 2.0
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cogs}\vfil
+			\vspace{1em}
+			\normalsize Journalisation automatique
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation simple
+		\end{minipage}	
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cubes}\vfil
+			\vspace{1em}
+			\normalsize Intégration avec Poutyne
+		\end{minipage}
+		\note{
+		}
+	\end{frame}
+
+	\begin{frame}{Journalisation automatique}
+		\begin{itemize}
+			\item Version du code (\faGit)*
+			\item Horodatage de l'entrainement
+			\item Succès/échec de l'entrainement
+			\item Configuration de l'ordinateur
+			\item Utilisateur
+		\end{itemize}
+	\note{*lorsque l'on utilise MLflow project}
+	\end{frame}
+
+	\begin{frame}{Visualisation simple}
+		\begin{Scode}
+			mlflow server -p 5000 -h 127.0.0.1 --backend-store-uri file:///absolute/path
+		\end{Scode}
+		\note{--backend-store-uri permet de gérer le lieu de la persistance
+		-h 127.0.0.1 permet d'ouvrir le port sinon 0.0.0.0 pour un local}
+	\end{frame}
+
+	\begin{frame}{Visualisation simple}
+		\centering
+		\begin{figure}
+			\includegraphics[width=\linewidth,keepaspectratio, height=0.7\textheight]{img/mlflow-ui.png}
+			\caption{\link{https://databricks.com/blog/2018/06/05/introducing-mlflow-an-open-source-machine-learning-platform.html}{Introducing MLflow: an Open Source Machine Learning Platform}}
+		\end{figure}
+	\end{frame}
+
+	\begin{frame}{Visualisation simple}
+		\begin{itemize}
+			\item Tri sur les expérimentations
+			\item Recherche des expérimentations
+			\item Requêtes sur les résultats
+			\item Exportation des résultats
+			\item Visualisation des métriques
+		\end{itemize}
+	\end{frame}
+
+
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La version de \guillemet{base} implique de journaliser manuellement 
+		\begin{itemize}
+			\item les paramètres de configuration,
+			\item les métriques à chaque étape et itération,
+			\item la version du code.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La solution, \color{bleu}MLFlowLogger\color{couleurpolice}, un \textit{callback} permettant de journaliser 
+		\begin{itemize}
+			\item semi-automatiquement les paramètres de configuration,
+			\item automatiquement les métriques à chaque étape et itération,
+			\item automatiquement la version du code,
+			\item automatiquement les métriques de test lors d'une phase de test.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad \vdots \\
+			\quad mlflow\_logger = MLFlowLogger(experiment\_name="experiment") \\
+			\quad mlflow\_logger.log\_config\_params(config\_params=cfg) \\
+		\end{Scode}
+	\end{frame}
+
+	\begin{frame}{Point négatif}
+		\begin{itemize}
+			\item La documentation n'est pas toujours facile à naviguer, et
+			\item très complexe de journaliser des artefacts, nous n'avons pas réussis.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{\link{https://wandb.ai/site}{Weights \& Biases}}
+		\framesubtitle{\textit{An open source platform for the machine learning lifecycle}}
+		
+		\centering
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cogs}\vfil
+			\vspace{1em}
+			\normalsize Journalisation automatique
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation simple et puissante
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Génération de graphique automatique
+		\end{minipage}	
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cubes}\vfil
+			\vspace{1em}
+			\normalsize Intégration avec Poutyne
+		\end{minipage}
+		\note{
+		}
+	\end{frame}
+	
+	\begin{frame}{Journalisation automatique}
+		\begin{itemize}
+			\item Version du code (\faGit)
+			\item Horodatage de l'entrainement
+			\item Succès/échec de l'entrainement
+			\item Configuration de l'ordinateur
+			\item Utilisateur
+			\item Génération automatique de graphique
+			\item Journalisation des artefacts et \textit{sweeps}
+			\item Via un Saas ou \link{https://github.com/wandb/local}{client}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\begin{Scode}
+			wandb local
+		\end{Scode}
+		\note{C'est une solution pas prod donc il tente fort de vendre une solution SaaS entreprise. Il y a un Tesseract pour le mettre en prod version mais ça prend une license.}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\centering
+		\begin{figure}
+			\includegraphics[width=\linewidth,keepaspectratio, height=0.7\textheight]{img/6066c22135b89828fead7950_visualize-seamlessly-weights-biases.jpg}
+			\caption{\link{https://wandb.ai/site}{Demo}}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\begin{itemize}
+			\item Tri sur les expérimentations
+			\item Recherche des expérimentations
+			\item Requêtes sur les résultats
+			\item Exportation des résultats
+			\item Visualisation des métriques
+			\item Interface avec \textbf{beaucoup} d'informations
+		\end{itemize}
+	\end{frame}
+	
+	
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La version de \guillemet{base} implique de journaliser manuellement 
+		\begin{itemize}
+			\item les paramètres de configuration,
+			\item les métriques à chaque étape et itération,
+			\item la version du code,
+			\item les artefacts.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La solution, \color{bleu}WandbLogger\color{couleurpolice}, un \textit{callback} permettant de journaliser 
+		\begin{itemize}
+			\item semi-automatiquement les paramètres de configuration,
+			\item automatiquement les métriques à chaque étape et itération,
+			\item automatiquement la version du code,
+			\item \textbf{automatiquement un modèle},
+			\item automatiquement les métriques de test lors d'une phase de test, et
+			\item manuellement des images et figures.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad \vdots \\
+			\quad wandb\_logger = WandB(name="experiment", project="A project") \\
+			\quad wandb\_logger.log\_config\_params(config\_params=cfg) \\
+			\quad \vdots \\
+			image = wandb.Image('a/image.png', caption="a caption")\\
+			wandb\_logger.run.log({"My image": image})
+		\end{Scode}
+	\end{frame}
+	
+	\begin{frame}{Point négatif}
+		Solution propriétaire (gratuit académique 40\$/mois utilisateur sinon).
+	\end{frame}
+
+		
+	\section{La suite}
+	\begin{frame}{Présentation des résultats}
+				\centering
+		\begin{minipage}{0.49\linewidth}
+				\centering
+				\fontsize{35}{35}\faTable\vfil
+				\vspace{1em}
+				\normalsize Génération automatique des tableaux
+		\end{minipage}
+		\begin{minipage}{0.49\linewidth}
+				\centering
+				\fontsize{35}{35}\faIcon{react}\vfil
+				\vspace{1em}
+				\normalsize Rapport dynamique
+		\end{minipage}
+	\end{frame}
+	\begin{frame}
+		\centering
+		\fontsize{35}{35}\faRefresh\vfil
+		\vspace{1em}
+		\normalsize Itérations d'expérimentations
+		\note{Développer des processus rigoureux (par essais, erreurs et journaux) et ne pas prendre tout ce qui a été discuté ici comme l'unique solution.}
+	\end{frame}
+	
+	\begin{frame}{Pour aller plus loin (en ordre)}
+		\begin{itemize}
+			\item Notification de l'état d'entrainement \link{https://notificationdoc.ca/}{Notif}
+			\item \link{https://cml.dev/}{Continuous Machine Learning (CML)} 
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}
+		\frametitle{Période de questions}
+		
+		\centering
+		\fontsize{100}{100}
+		\faQuestion
+		
+	\end{frame}
+
+	\input{couverture-arriere}
+	
+	\begin{frame}[t, allowframebreaks]
+		\frametitle{References}
+		\bibliographystyle{apalike}
+		\bibliography{GECR}
+	\end{frame}
+	
+	
+	
+\end{document}
