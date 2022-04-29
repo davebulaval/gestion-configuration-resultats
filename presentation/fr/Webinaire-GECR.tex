@@ -650,12 +650,11 @@ BoldFont = *-Regular
 	\end{frame}
 
 	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
-		La solution, \color{bleu}MLFlowWriter\color{couleurpolice}, un \textit{callback} permettant de journaliser 
+		La solution, \color{bleu}MLFlowLogger\color{couleurpolice}, un \textit{callback} permettant de journaliser 
 		\begin{itemize}
 			\item semi-automatiquement les paramètres de configuration,
 			\item automatiquement les métriques à chaque étape et itération,
 			\item automatiquement la version du code,
-			\item manuellement un modèle,
 			\item automatiquement les métriques de test lors d'une phase de test.
 		\end{itemize}
 	\end{frame}
@@ -667,13 +666,126 @@ BoldFont = *-Regular
 			\quad \vdots \\
 			\quad mlflow\_logger = MLFlowLogger(experiment\_name="experiment") \\
 			\quad mlflow\_logger.log\_config\_params(config\_params=cfg) \\
-			\quad \vdots \\
-			\quad mlflow\_logger.log\_model()\\
 		\end{Scode}
 	\end{frame}
 
 	\begin{frame}{Point négatif}
-		La documentation n'est pas toujours facile à naviguer.
+		\begin{itemize}
+			\item La documentation n'est pas toujours facile à naviguer, et
+			\item très complexe de journaliser des artefacts, nous n'avons pas réussis.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{\link{https://wandb.ai/site}{Weights \& Biases}}
+		\framesubtitle{\textit{An open source platform for the machine learning lifecycle}}
+		
+		\centering
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cogs}\vfil
+			\vspace{1em}
+			\normalsize Journalisation automatique
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Visualisation simple et puissante
+		\end{minipage}
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faLineChart\vfil
+			\vspace{1em}
+			\normalsize Génération de graphique automatique
+		\end{minipage}	
+		\begin{minipage}{0.24\linewidth}
+			\centering
+			\fontsize{35}{35}\faIcon{cubes}\vfil
+			\vspace{1em}
+			\normalsize Intégration avec Poutyne
+		\end{minipage}
+		\note{
+		}
+	\end{frame}
+	
+	\begin{frame}{Journalisation automatique}
+		\begin{itemize}
+			\item Version du code (\faGit)
+			\item Horodatage de l'entrainement
+			\item Succès/échec de l'entrainement
+			\item Configuration de l'ordinateur
+			\item Utilisateur
+			\item Génération automatique de graphique
+			\item Journalisation des artefacts et \textit{sweeps}
+			\item Via un Saas ou \link{https://github.com/wandb/local}{client}
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\begin{Scode}
+			wandb local
+		\end{Scode}
+		\note{C'est une solution pas prod donc il tente fort de vendre une solution SaaS entreprise. Il y a un Tesseract pour le mettre en prod version mais ça prend une license.}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\centering
+		\begin{figure}
+			\includegraphics[width=\linewidth,keepaspectratio, height=0.7\textheight]{img/6066c22135b89828fead7950_visualize-seamlessly-weights-biases.jpg}
+			\caption{\link{https://wandb.ai/site}{Demo}}
+		\end{figure}
+	\end{frame}
+	
+	\begin{frame}{Visualisation simple}
+		\begin{itemize}
+			\item Tri sur les expérimentations
+			\item Recherche des expérimentations
+			\item Requêtes sur les résultats
+			\item Exportation des résultats
+			\item Visualisation des métriques
+			\item Interface avec \textbf{beaucoup} d'informations
+		\end{itemize}
+	\end{frame}
+	
+	
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La version de \guillemet{base} implique de journaliser manuellement 
+		\begin{itemize}
+			\item les paramètres de configuration,
+			\item les métriques à chaque étape et itération,
+			\item la version du code,
+			\item les artefacts.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Intégration avec \link{https://poutyne.org/}{Poutyne}}
+		La solution, \color{bleu}WandbLogger\color{couleurpolice}, un \textit{callback} permettant de journaliser 
+		\begin{itemize}
+			\item semi-automatiquement les paramètres de configuration,
+			\item automatiquement les métriques à chaque étape et itération,
+			\item automatiquement la version du code,
+			\item \textbf{automatiquement un modèle},
+			\item automatiquement les métriques de test lors d'une phase de test, et
+			\item manuellement des images et figures.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}{Exemple}
+		\begin{Scode}
+			@hydra.main(config\_path='conf/config.yaml') \\
+			def main(cfg): \\
+			\quad \vdots \\
+			\quad wandb\_logger = WandB(name="experiment", project="A project") \\
+			\quad wandb\_logger.log\_config\_params(config\_params=cfg) \\
+			\quad \vdots \\
+			image = wandb.Image('a/image.png', caption="a caption")\\
+			wandb\_logger.run.log({"My image": image})
+		\end{Scode}
+	\end{frame}
+	
+	\begin{frame}{Point négatif}
+		Solution propriétaire (gratuit académique 40\$/mois utilisateur sinon).
 	\end{frame}
 
 		
